@@ -2,10 +2,12 @@ package ucl.ccs.authcli;
 
 import com.custodix.rest.security.RestSecurityUtils;
 import com.custodix.sts.STSClient;
+import java.io.BufferedReader;
 import java.io.Console;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
@@ -22,11 +24,30 @@ import org.apache.ws.security.WSPasswordCallback;
  */
 public class App {
 
+    public static String readLine() throws IOException {
+        Console console = System.console();
+        if (console != null) {
+            return console.readLine();
+        } else {
+            BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
+            return r.readLine();
+        }
+    }
+
+    public static String readPassword() throws IOException {
+        Console console = System.console();
+        if (console != null) {
+            return new String(console.readPassword());
+        } else {
+            BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
+            return r.readLine();
+        }
+    }
+
     public static void main(String[] args) throws Exception {
         String server = "https://dev-pmed-idp-vm.custodix.com/sts2/services/STS";
         String service = "http://localhost:8080/carafe/";
 
-        Console console = System.console();
         BasicParser parser = new BasicParser();
         Options options = new Options();
         options.addOption("s", "service", true, "service URL (default: " + service + ")");
@@ -50,24 +71,24 @@ public class App {
         if (line.hasOption("S")) {
             server = line.getOptionValue("S");
         }
-        console.printf("Using service %s\n", service);
-        console.printf("Using cred server %s\n", server);
+        System.out.printf("Using service %s\n", service);
+        System.out.printf("Using cred server %s\n", server);
 
         if (line.hasOption("u")) {
             username = line.getOptionValue("u");
         } else {
-            console.printf("Enter username: ");
-            username = console.readLine();
+            System.out.printf("Enter username: ");
+            username = readLine();
         }
 
         if (line.hasOption("p")) {
             password = line.getOptionValue("p");
         } else {
-            console.printf("Enter password: ");
-            password = new String(console.readPassword());
+            System.out.printf("Enter password: ");
+            password = readPassword();
         }
 
-        console.printf("Trying to fetch credentials...\n");
+        System.out.printf("Trying to fetch credentials...\n");
 
         STSClient client = new STSClient(username, new CallbackHandler() {
 
@@ -88,13 +109,13 @@ public class App {
                 FileOutputStream s = new FileOutputStream(f);
                 s.write(header.getBytes());
                 s.close();
-                console.printf("You authz header was written to %s\n", outputFile);
+                System.out.printf("You authz header was written to %s\n", outputFile);
             } else {
-                console.printf("Your authz header value should be:\n\n%s\n\n", header);
+                System.out.printf("Your authz header value should be:\n\n%s\n\n", header);
             }
         } catch (Exception e) {
-            console.printf("Failed to fetch credentials:\n");
-            e.printStackTrace(console.writer());
+            System.out.printf("Failed to fetch credentials:\n");
+            e.printStackTrace(System.out);
         }
     }
 }
