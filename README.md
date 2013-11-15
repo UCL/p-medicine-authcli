@@ -30,5 +30,5 @@ Options:
 * `-p,--password <arg>`   password
 * `-s,--service <arg>`    service URL (default: http://localhost:8080/carafe/)
 * `-S,--server <arg>`     authentication server to use (default: https://dev-pmed-idp-vm.custodix.com/sts2/services/STS)
-* -u,--user <arg>       user name
+* `-u,--user <arg>`       user name
 
