@@ -3,6 +3,8 @@ package ucl.ccs.authcli;
 import com.custodix.rest.security.RestSecurityUtils;
 import com.custodix.sts.STSClient;
 import java.io.Console;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -32,6 +34,7 @@ public class App {
         options.addOption("u", "user", true, "user name");
         options.addOption("p", "password", true, "password");
         options.addOption("S", "server", true, "authentication server to use (default: " + server + ")");
+        options.addOption("o", "output", true, "output file name (default: print to stdout)");
         CommandLine line = parser.parse(options, args);
         if (line.hasOption("h")) {
             HelpFormatter formatter = new HelpFormatter();
@@ -76,7 +79,19 @@ public class App {
         try {
             SecurityToken token = client.requestSecurityToken(service);
             String header = RestSecurityUtils.createHttpAuthzHeaderValue(token);
-            console.printf("Your authz header value should be:\n\n%s\n\n", header);
+            if (line.hasOption("o")) {
+                String outputFile = line.getOptionValue("o");
+                File f = new File(outputFile);
+                f.createNewFile();
+                f.setReadable(false, false);
+                f.setReadable(true, true);
+                FileOutputStream s = new FileOutputStream(f);
+                s.write(header.getBytes());
+                s.close();
+                console.printf("You authz header was written to %s\n", outputFile);
+            } else {
+                console.printf("Your authz header value should be:\n\n%s\n\n", header);
+            }
         } catch (Exception e) {
             console.printf("Failed to fetch credentials:\n");
             e.printStackTrace(console.writer());
