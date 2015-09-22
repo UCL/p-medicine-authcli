@@ -45,8 +45,8 @@ public class App {
     }
 
     public static void main(String[] args) throws Exception {
-        String server = "https://dev-pmed-idp-vm.custodix.com/sts2/services/STS";
-        String service = "http://localhost:8080/carafe/";
+        String server = "https://ciam-pmed.custodix.com/sts/services/STS";
+        String service = "https://eh-services.vph.psnc.pl:8282/dwh/";
 
         BasicParser parser = new BasicParser();
         Options options = new Options();
